@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "*.kicad_sym": "lisp",
+        "*.kicad_mod": "lisp",
+        "exception": "cpp",
+        "ostream": "cpp"
+    }
+}
