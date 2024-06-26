@@ -1,5 +1,6 @@
 #include "soo_renderer.h"
 #include "soo_exception.h"
+SooRenderer::SooRenderer(SDL_Renderer *ren):mRenderer(ren){}
 SooRenderer::~SooRenderer(){
     SDL_DestroyRenderer(mRenderer);
 }
@@ -24,7 +25,7 @@ void SooRenderer::FillRect(const SDL_Rect *rect){
         throw EX(SDL_GetError());
     }
 }
-void SooRenderer::Present(){
+void SooRenderer::Present() throw(){
     SDL_RenderPresent(mRenderer);
 }
 void SooRenderer::DrawLine(int x1,int y1,int x2,int y2){

@@ -18,7 +18,8 @@ SooException::SooException(const char *file,int line,const char *m){
 SooException::SooException(const char *file,int line,const exception &ex,const char *m)
 {
         std::ostringstream ss;
-        ss << file << '(' << line << ')' << m << "=>" << ex.what() << std::endl;
+        ss << file << '(' << line << ')' << m << std::endl;
+        ss << "  " << ex.what() << std::endl;
         auto msg=ss.str();
         mMsg = new char[msg.size()+1];
         msg.copy(mMsg,msg.size()+1);

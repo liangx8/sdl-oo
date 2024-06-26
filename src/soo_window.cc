@@ -19,12 +19,12 @@ SooSurface* SooWindow::GetSurface(){
     return new SooSurface(SDL_GetWindowSurface(mWin));
 }
 SooRenderer* SooWindow::CreateRenderer(int index,Uint32 flags){
+    // 备忘：rederer 好像只能建立一次
     auto ren=SDL_CreateRenderer(mWin,index,flags);
     if(ren == NULL){
         throw EX(SDL_GetError());
     }
-    SooRenderer *sooRen=new SooRenderer();
-    sooRen->mRenderer=ren;
+    SooRenderer *sooRen=new SooRenderer(ren);
     return sooRen;
 }
 void SooWindow::UpdateWindowSurface(){

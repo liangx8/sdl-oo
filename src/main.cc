@@ -1,9 +1,9 @@
 #include <iostream>
+#include <string>
 #include <exception>
 #include "mygame.h"
 
 using namespace std;
-
 
 int main(int argc,char **argv)
 {
@@ -11,7 +11,7 @@ int main(int argc,char **argv)
         MyGame game("消除游戏");
         game.Poll();
     }catch(exception &e){
-        cout << "错误原因:" << e.what() << endl;
+        cout <<e.what();
     }
     return 0;
 }
