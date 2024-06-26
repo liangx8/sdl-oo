@@ -4,11 +4,11 @@
 #include <fstream>
 class PngName{
 private:
-    std::stringbuf mSbuf;
+    std::string mStr;
     std::ifstream mPngs;
     long mMax;
 public:
-    const std::string Name();
+    const std::string& Name();
     PngName();
     ~PngName();
 };

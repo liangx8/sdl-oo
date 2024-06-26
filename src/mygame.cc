@@ -35,6 +35,11 @@ MyGame::~MyGame(){
 }
 bool MyGame::OnEvent(SDL_Event *ev)
 {
+    if(ev->type == SDL_KEYUP){
+        if(ev->key.keysym.sym==SDLK_n){
+            SetRandomPicture();
+        }
+    }
     return false;
 }
 bool MyGame::Alter()
@@ -51,29 +56,36 @@ int MyGame::Render()
 
 Uint32 callback(Uint32 interval,void *param)
 {
-    
-    int v=(long)param;
-    std::cout << "时间" << interval  << "param: " << v << std::endl;
-    if(interval >500){
-        return interval - 500;
+    MyGame *game=(MyGame *)param;
+    if(interval <9000){
+        std::cout << "时间" << interval  << "param: " << std::endl;
+        if(interval >500){
+            return interval - 500;
+        }
     }
+    
     std::cout << "计时终止" << std::endl;
-
-    return 0;
+    game->SetRandomPicture();
+    return 10000;
 }
-int MyGame::OnInit()
+void MyGame::SetRandomPicture()
 {
-    mTimer=SDL_AddTimer(3000,callback,this);
+    //SDL_Rect rect1={0,0,300,300};
+    SDL_Rect rect2={50,50,300,300};
     try{
-        
         std::string name=mPngs->Name();
         std::cout << "文件名:" << name << std::endl;
         SooSurface *png=new SooSurface(name.c_str());
-        mWin->BlitSurface(png);
+        mWin->BlitSurface(png,NULL,&rect2);
         mWin->UpdateWindowSurface();
         delete png;
     } catch(std::exception &e){
         throw;
     }
+}
+int MyGame::OnInit()
+{
+    mTimer=SDL_AddTimer(3000,callback,this);
+    SetRandomPicture();
     return 0;
 }

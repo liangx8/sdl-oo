@@ -12,8 +12,9 @@ SooWindow::SooWindow(const char *title,int x,int y,int w,int h,uint32_t flag)
     if(mWin == nullptr){
         throw EX(SDL_GetError());
     }
-    int width,heigh;
-    SDL_GetWindowSize(mWin,&width,&heigh);
+}
+void SooWindow::GetSize(int *w,int *h){
+    SDL_GetWindowSize(mWin,w,h);
 }
 SooSurface* SooWindow::GetSurface(){
     return new SooSurface(SDL_GetWindowSurface(mWin));
@@ -32,11 +33,11 @@ void SooWindow::UpdateWindowSurface(){
         throw EX(SDL_GetError());
     }
 }
-void SooWindow::BlitSurface(SooSurface *src)
+void SooWindow::BlitSurface(SooSurface *src,SDL_Rect *srcr,SDL_Rect *dstr)
 {
     auto surf=GetSurface();
     auto newSurf=SDL_ConvertSurface(src->mSurf,surf->mSurf->format,0);
-    SDL_BlitSurface(newSurf,NULL,surf->mSurf,NULL);
+    SDL_BlitSurface(newSurf,srcr,surf->mSurf,dstr);
     SDL_FreeSurface(newSurf);
     delete surf;
 }

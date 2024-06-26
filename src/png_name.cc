@@ -1,4 +1,5 @@
-
+#include <memory>
+#include <iostream>
 #include <fstream>
 #include <filesystem>
 #include <ctime> // clock()
@@ -21,7 +22,7 @@ PngName::PngName(){
 
 // 文件路径长度不超过ＭＡＸＳＩＺＥ
 #define MAXSIZE 256
-const std::string PngName::Name()
+const std::string& PngName::Name()
 {
     try{
         
@@ -33,10 +34,14 @@ const std::string PngName::Name()
         }else {
             pos -=MAXSIZE;
         }
+        std::cout <<"文件位置:" <<pos << std::endl;
+
         mPngs.seekg(pos,std::ios::beg);
+
         char *buf=new char[MAXSIZE];
         mPngs.read(buf,MAXSIZE);
         if(!mPngs.good()){
+            delete [] buf;
             throw EX("read file error");
         }
         
@@ -45,15 +50,15 @@ const std::string PngName::Name()
             idx++;
         }
         idx++;
-        
+        std::stringbuf sb;
         while(*(buf+idx)!='\n'){
-            mSbuf.sputc(*(buf+idx));
+            sb.sputc(*(buf+idx));
             idx ++;
         }
-        mSbuf.sputc('\0');
-        mPngs.close();
+        sb.sputc('\0');
+        mStr = sb.str();
         delete [] buf;
-        return mSbuf.str();
+        return mStr;
     } catch (std::exception &e){
         throw EXMSG(e,"读文件错误");
     } catch (...){
