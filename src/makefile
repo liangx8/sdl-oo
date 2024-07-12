@@ -11,10 +11,14 @@ else
 	CFLAGS+=${OPTS}
 endif
 
+#CFLAGS +=-std=c++14
+
 SRCS=$(wildcard *.cc)
 OBJS=${SRCS:.cc=.o}
 LDFLAGS=-Wall
-LDFLAGS+=$(shell pkgconf sdl2 --libs) -lSDL2_image
+LDFLAGS+=$(shell pkgconf sdl2 --libs)
+LDFLAGS+=-lSDL2_image
+LDFLAGS+=-lSDL2_ttf
 LDFLAGS+=# -static
 
 all:${TARGET}

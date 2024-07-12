@@ -9,7 +9,7 @@ private:
     long mMax;
 public:
     const std::string& Name();
-    PngName();
+    PngName(const char*);
     ~PngName();
 };
 #endif

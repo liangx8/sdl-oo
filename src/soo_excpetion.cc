@@ -1,39 +1,21 @@
 #include <iostream>
-#include <sstream>
+#include <SDL.h>
 #include "soo_exception.h"
 
 const char *SooException::what() const throw(){
     
-    return mMsg;
+    return m_strMsg.c_str();
 }
 
-SooException::SooException(const char *file,int line,const char *m){
-    std::ostringstream ss;
-    ss << file << '(' << line << ')' << m << std::endl;
-    auto msg=ss.str();
-    mMsg = new char[msg.size()+1];
-    msg.copy(mMsg,msg.size()+1);
-        
-}
-SooException::SooException(const char *file,int line,const exception &ex,const char *m)
+SooException::SooException(const char *msg):
+    exception(),
+    m_strMsg(msg){}
+SooException::SooException(const exception &ex,const char *m):
+    exception(),
+    m_strMsg(ex.what())
 {
-        std::ostringstream ss;
-        ss << file << '(' << line << ')' << m << std::endl;
-        ss << "  " << ex.what() << std::endl;
-        auto msg=ss.str();
-        mMsg = new char[msg.size()+1];
-        msg.copy(mMsg,msg.size()+1);
+    m_strMsg += m;
 }
 SooException::~SooException(){
-    delete []mMsg;
 }
 
-Yes::Yes(const char *n,const char *f,int num):msg(n),file(f),seq(num){
-    std::cout << "开始　" << n << " " << f << "(" << num << ")" << std::endl;
-}
-Yes::~Yes(){
-    std::cout << "结束　" << msg << " " << file <<"(" << seq << ")" << std::endl;
-}
-void Yes::show() const{
-    std::cout << "显示　" << msg << " " << file <<"(" << seq << ")" << std::endl;
-}

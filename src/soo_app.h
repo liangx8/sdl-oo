@@ -1,5 +1,4 @@
-#ifndef SOO_APP_H_JFW4J34
-#define SOO_APP_H_JFW4J34
+#pragma once
 #include <SDL.h>
 class SooApp{
 private:
@@ -17,7 +16,5 @@ public:
      * @param imgFlag param of IMG_Init()
      */
     SooApp(Uint32 sdlFlag,Uint32 imgFlag);
-    void Poll();
-    int RunAt(Uint32,int (*run)(void *));
+    void Run();
 };
-#endif

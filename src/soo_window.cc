@@ -16,8 +16,16 @@ SooWindow::SooWindow(const char *title,int x,int y,int w,int h,uint32_t flag)
 void SooWindow::GetSize(int *w,int *h){
     SDL_GetWindowSize(mWin,w,h);
 }
+void SooWindow::GetPos(int *rx,int *ry)
+{
+    SDL_GetWindowPosition(mWin,rx,ry);
+}
 SooSurface* SooWindow::GetSurface(){
-    return new SooSurface(SDL_GetWindowSurface(mWin));
+    SDL_Surface *surf=SDL_GetWindowSurface(mWin);
+    if(surf==NULL){
+        throw EX(SDL_GetError());
+    }
+    return new SooSurface(surf);
 }
 SooRenderer* SooWindow::CreateRenderer(int index,Uint32 flags){
     // 备忘：rederer 好像只能建立一次
