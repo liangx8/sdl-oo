@@ -7,7 +7,7 @@ class SooRenderer;
 class SooWindow{
 private:
     SDL_Window *mWin;
-    SooRenderer *m_render;
+    std::unique_ptr<SooRenderer> m_render;
     //std::unique_ptr<SooSurface> mSurf;
 public:
     SooWindow(const SooWindow &)=delete;

@@ -1,6 +1,6 @@
 #include <SDL_image.h>
 #include <SDL_ttf.h>
-
+#include <iostream>
 #include "soo_renderer.h"
 #include "soo_texture.h"
 #include "soo_exception.h"
@@ -68,6 +68,21 @@ void SooTexture::setRenderTarget(SooRenderer *render)
         throw EX(SDL_GetError());
     }
 
+}
+void SooTexture::modify(const SDL_Rect* r,pixelMofify fn)
+{
+    void *pixels;
+    int pitch;
+    if(SDL_LockTexture(mTexture,r,&pixels,&pitch)){
+        throw EX(SDL_GetError());
+    }
+    int height=0;
+    // fixme:
+    if(r){
+        std::cout <<"rw:"<< r->w << "rh:" << r->h << std::endl;
+    }
+    fn(pixels,pitch,height);
+    SDL_UnlockTexture(mTexture);
 }
 // const char* SooTexture::className()
 // {

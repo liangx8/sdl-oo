@@ -9,13 +9,20 @@
 Resource::~Resource(){
     std::cout << "Resource 结束" << std::endl;
 }
-
+void pixeledit(void *pixels,int pitch,int height)
+{
+    uint8_t *buf=static_cast<Uint8*>(pixels);
+    std::cout <<"pitch: "<< pitch << std::endl;
+    for(int ix=0;ix<pitch*2;ix++){
+        *(buf+ix)=ix & 0xff;
+    }
+}
 void loadBackground(Resource *res,SooRenderer *render,int w,int h)
 {
-    
+#if 0
     res->background=std::make_unique<SooTexture>(render,SDL_PIXELFORMAT_ABGR8888,SDL_TEXTUREACCESS_TARGET,w,h);
-    auto textrueBackground=res->background.get();
-    textrueBackground->setRenderTarget(render);
+    auto textureBackground=res->background.get();
+    textureBackground->setRenderTarget(render);
 
     render->SetDrawColor(0x0f,0x20,0x90,0xff);
     
@@ -43,7 +50,12 @@ void loadBackground(Resource *res,SooRenderer *render,int w,int h)
         ly += cd;
     }
     render->resetTarget();
-    textrueBackground->render(render,nullptr,nullptr);
+#else
+    SDL_Rect rt={0,0,400,200};
+    res->background=std::make_unique<SooTexture>(render,SDL_PIXELFORMAT_ABGR8888,SDL_TEXTUREACCESS_STREAMING,w,h);
+    res->background->modify(&rt,pixeledit);
+#endif
+    res->background->render(render,nullptr,nullptr);
 }
 Resource::Resource(SooRenderer *render,int w,int h):mainMenu(std::make_unique<MainMenu>(render,w,h))
 {

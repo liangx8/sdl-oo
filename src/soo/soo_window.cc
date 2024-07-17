@@ -8,7 +8,7 @@
 
 SooWindow::SooWindow(const char *title,int x,int y,int w,int h,uint32_t flag) 
 {
-#if 0
+#if 1
     SDL_Renderer *render;
     if(SDL_CreateWindowAndRenderer(w,h,flag,&mWin,&render)){
         throw EX(SDL_GetError());
@@ -29,6 +29,7 @@ void SooWindow::GetSize(int *w,int *h){
 void SooWindow::GetPos(int *rx,int *ry)
 {
     SDL_GetWindowPosition(mWin,rx,ry);
+
 }
 SooSurface* SooWindow::GetSurface(){
     SDL_Surface *surf=SDL_GetWindowSurface(mWin);
@@ -38,15 +39,16 @@ SooSurface* SooWindow::GetSurface(){
     return new SooSurface(surf);
 }
 SooRenderer* SooWindow::CreateRenderer(int index,Uint32 flags){
+#if 0
     if(m_render==nullptr){
         SDL_Renderer *rdr=SDL_CreateRenderer(mWin,index,flags);
         if(rdr==nullptr){
             throw EX(SDL_GetError());
         }
-        m_render=new SooRenderer(rdr);
-        std::cout << std::hex << rdr << m_render <<std::endl;
+        m_render=std::make_unique<SooRenderer>(rdr);
     }
-    return m_render;
+#endif
+    return m_render.get();
 }
 void SooWindow::UpdateWindowSurface(){
     if(SDL_UpdateWindowSurface(mWin)){
@@ -65,11 +67,6 @@ SooWindow::~SooWindow()
 {
     const char *title = SDL_GetWindowTitle(mWin);
     std::cout << "SooWindow destruction <<" << title << ">>" << std::endl;
-    if(m_render){
-        delete m_render;
-    }
     SDL_DestroyWindow(mWin);
-
-    
 }
 

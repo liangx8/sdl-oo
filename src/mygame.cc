@@ -39,7 +39,9 @@ MyGame::MyGame(const char *title)
         m_rectMain->w=win_w-PLAYAREA_BOARD_W;
         m_rectMain->x=PLAYAREA_BOARD_W/2;
         m_rectMain->y=PLAYAREA_BOARD_H/2;
+        std::cout << "width1: " << win_w << ", height1:" << win_h << std::endl;
         mWin = std::make_unique<SooWindow>(title,SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,win_w,win_h,SDL_WINDOW_SHOWN);
+
         mRender=mWin->CreateRenderer(-1,SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
         mRender->Clear();
         SDL_RendererInfo *info=mRender->RenderInfo();
@@ -109,6 +111,7 @@ void MyGame::init()
     mTimer=SDL_AddTimer(3000,callback,this);
     int w,h;
     mWin->GetSize(&w,&h);
+    std::cout << "width: " << w << ", height:" << h << std::endl;
     m_res=std::make_unique<Resource>(mRender,w,h);
     //mainbox(mRender,m_rectMain.get());
     m_res->mainMenu->paintAll();

@@ -2,6 +2,8 @@
 
 #include <SDL.h>
 #include <SDL_ttf.h>
+
+typedef void (*pixelMofify)(void *pixels,int pitch,int height);
 class SooRenderer;
 /**
  * @brief class Texture is a data of view in memory
@@ -23,4 +25,5 @@ public:
     void SetAlphaMod(Uint8 alpha);
     void render(SooRenderer *target,SDL_Rect *src,SDL_Rect *dst);
     void setRenderTarget(SooRenderer *render);
+    void modify(const SDL_Rect*,pixelMofify);
 };
