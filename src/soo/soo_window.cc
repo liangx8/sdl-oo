@@ -8,10 +8,20 @@
 
 SooWindow::SooWindow(const char *title,int x,int y,int w,int h,uint32_t flag) 
 {
-    mWin=SDL_CreateWindow(title,x,y,w,h,flag);
-    if(mWin == nullptr){
+#if 0
+    SDL_Renderer *render;
+    if(SDL_CreateWindowAndRenderer(w,h,flag,&mWin,&render)){
         throw EX(SDL_GetError());
     }
+    SDL_SetWindowTitle(mWin,title);
+    m_render=std::unique_ptr<SooRenderer>(new SooRenderer(render));
+#else
+    mWin=SDL_CreateWindow(title,x,y,w,h,flag);
+    if(mWin==nullptr){
+        throw EX(SDL_GetError());
+    }
+    m_render=nullptr;
+#endif
 }
 void SooWindow::GetSize(int *w,int *h){
     SDL_GetWindowSize(mWin,w,h);
@@ -28,13 +38,15 @@ SooSurface* SooWindow::GetSurface(){
     return new SooSurface(surf);
 }
 SooRenderer* SooWindow::CreateRenderer(int index,Uint32 flags){
-    // 备忘：rederer 好像只能建立一次
-    auto ren=SDL_CreateRenderer(mWin,index,flags);
-    if(ren == NULL){
-        throw EX(SDL_GetError());
+    if(m_render==nullptr){
+        SDL_Renderer *rdr=SDL_CreateRenderer(mWin,index,flags);
+        if(rdr==nullptr){
+            throw EX(SDL_GetError());
+        }
+        m_render=new SooRenderer(rdr);
+        std::cout << std::hex << rdr << m_render <<std::endl;
     }
-    SooRenderer *sooRen=new SooRenderer(ren);
-    return sooRen;
+    return m_render;
 }
 void SooWindow::UpdateWindowSurface(){
     if(SDL_UpdateWindowSurface(mWin)){
@@ -53,6 +65,11 @@ SooWindow::~SooWindow()
 {
     const char *title = SDL_GetWindowTitle(mWin);
     std::cout << "SooWindow destruction <<" << title << ">>" << std::endl;
+    if(m_render){
+        delete m_render;
+    }
     SDL_DestroyWindow(mWin);
+
+    
 }
 

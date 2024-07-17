@@ -1,2 +1,4 @@
-src/soo
+src/block
 src/*.o
+src/soo/*.o
+*.txt

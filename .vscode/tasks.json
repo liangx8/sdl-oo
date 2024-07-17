@@ -28,6 +28,17 @@
             "command":"make",
             "args": ["clean"],
             "problemMatcher":[]
+        },
+        {
+            "label": "debug-build",
+            "dependsOn":"clean",
+            "type": "shell",
+            "command":"make",
+            "args": ["OPTS=-g"],
+            "options": {
+                "cwd": "${workspaceFolder}/src"
+            },
+            "problemMatcher":"$gcc"
         }
     ]
 }

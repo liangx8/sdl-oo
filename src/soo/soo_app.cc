@@ -2,7 +2,9 @@
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 #include "soo_app.h"
+#include "soo_command.h"
 #include "soo_exception.h"
+
 SooApp::SooApp(Uint32 sdlf,Uint32 imgf):mMode(1)
 {
     if(SDL_Init(sdlf)){
@@ -30,7 +32,6 @@ SooApp::SooApp(Uint32 flag):mMode(0)
 }
 SooApp::~SooApp()
 {
-    std::cout << "SooApp destruction" << std::endl;
     if(mMode==1){
         IMG_Quit();
     }
@@ -38,24 +39,16 @@ SooApp::~SooApp()
     SDL_Quit();
 }
 void SooApp::Run(){
-    bool run=true;
     SDL_Event ev;
-    OnInit();
-    while(run){
-        bool update=false;
+    init();
+    while(1){
         while(SDL_PollEvent(&ev)){
-            if(ev.type==SDL_QUIT){
-                run = false;
+            if(ev.type == SDL_QUIT){
+                // break outer while{}
+                return;
             }
-            if(OnEvent(&ev)){
-                update=true;
-            }
+            triggerEvent(&ev);
         }
-        if(Alter()){
-            update=true;
-        }
-        if(update){
-            Render();
-        }
+        update();
     }
 }

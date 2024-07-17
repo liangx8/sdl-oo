@@ -2,15 +2,16 @@
 #include <exception>
 #include <SDL_image.h>
 
-#include "soo_surface.h"
-#include "soo_exception.h"
-#include "soo_window.h"
-#include "soo_renderer.h"
-#include "soo_texture.h"
-#include "soo_brush.h"
+#include "soo/soo_surface.h"
+#include "soo/soo_exception.h"
+#include "soo/soo_window.h"
+#include "soo/soo_renderer.h"
+#include "soo/soo_texture.h"
+#include "soo/soo_command.h"
+#include "gmenu.h"
+#include "resources.h"
 #include "mygame.h"
 #include "png_name.h"
-#include "resources.h"
 #define BORDER 100
 
 const char *png_list="../png-list.txt";
@@ -25,8 +26,8 @@ void mainbox(SooRenderer *render,SDL_Rect *rect)
 MyGame::MyGame(const char *title)
     try:
     SooApp(SDL_INIT_VIDEO|SDL_INIT_TIMER,IMG_INIT_PNG),
-    mRes(std::make_unique<Resource>()),
-    m_rectMain(std::make_unique<SDL_Rect>())
+    m_rectMain(std::make_unique<SDL_Rect>()),
+    m_outdate(false)
     {
         mPngs = std::make_unique<PngName>(png_list);
         
@@ -41,56 +42,16 @@ MyGame::MyGame(const char *title)
         mWin = std::make_unique<SooWindow>(title,SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,win_w,win_h,SDL_WINDOW_SHOWN);
         mRender=mWin->CreateRenderer(-1,SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
         mRender->Clear();
+        SDL_RendererInfo *info=mRender->RenderInfo();
+        std::cout << "render driver name: " <<info->name << std::endl;
+        delete info;
     }catch(std::exception &ex){
         throw;
     }
 MyGame::~MyGame(){
     std::cout << "MyGame destruction" << std::endl;
     SDL_RemoveTimer(mTimer);
-    delete mRender;
 }
-bool MyGame::OnEvent(SDL_Event *ev)
-{
-    switch(ev->type){
-        case SDL_KEYUP:
-            switch(ev->key.keysym.sym){
-            case SDLK_n:
-                SetRandomPicture();
-                return true;
-            case SDLK_f:
-                mainbox(mRender,m_rectMain.get());
-                return true;
-            }
-        case SDL_KEYDOWN:
-            ShowCount();
-            mCount ++;
-            return true;
-        case SDL_MOUSEMOTION:
-        case SDL_MOUSEBUTTONDOWN:
-        case SDL_MOUSEBUTTONUP:
-        case SDL_MOUSEWHEEL:
-        case SDL_WINDOWEVENT:
-        break;
-        case SDL_DISPLAYEVENT:
-            std::cout << "displayevent" << std::endl;
-            break;
-        default:
-            std::cout << "未知の出来事" << std::endl;
-    }
-    return false;
-}
-bool MyGame::Alter()
-{
-    return false;
-}
-int MyGame::Render()
-{
-    mRender->Present();
-    std::cout << "さん・さま・ちやん" << std::endl;
-    return 0;
-}
-
-
 
 Uint32 callback(Uint32 interval,void *param)
 {
@@ -107,18 +68,12 @@ Uint32 callback(Uint32 interval,void *param)
 }
 void MyGame::ShowCount()
 {
-    SDL_Rect rect={1000,20,0,0};
+    //SDL_Rect rect={1000,20,0,0};
     int n=mCount;
     while(n){
         int m=n /10;
         int d=n  - (m *10);
         n=m;
-        SooTexture *st=mRes->number[d];
-
-        st->GetSize(&rect.w,&rect.h);
-        rect.x -= rect.w;
-        mRender->RenderCopy(mRes->background,&rect,&rect);
-        mRender->RenderCopy(st,NULL,&rect);
         std::cout << d;
     }
     std::cout  << "=" << mCount<< std::endl;
@@ -142,21 +97,33 @@ void MyGame::SetRandomPicture()
 #else
     //SDL_Rect rect1={0,0,300,300};
     SDL_Rect rect2={50,50,0,0};
-    std::unique_ptr<SooTexture> png(mRender->CreateTexture(name.c_str()));
+    std::unique_ptr<SooTexture> png=std::make_unique<SooTexture>(mRender, name.c_str());
     png->GetSize(&rect2.w,&rect2.h);
-    mRender->RenderCopy(png.get(),NULL,&rect2);
+    png->render(mRender,NULL,&rect2);
     //mRender->Present();
 #endif
 }
-int MyGame::OnInit()
+void MyGame::init()
 {
     
     mTimer=SDL_AddTimer(3000,callback,this);
     int w,h;
     mWin->GetSize(&w,&h);
-    mRes->loadTexture(mRender, w,h);
-    mainbox(mRender,m_rectMain.get());
-    mRes->renderMe(mRender,m_rectMain.get());
-    Render();
-    return 0;
+    m_res=std::make_unique<Resource>(mRender,w,h);
+    //mainbox(mRender,m_rectMain.get());
+    m_res->mainMenu->paintAll();
+    std::cout << m_res->mainMenu->commandAt(0)->getDescription() << std::endl;
+    std::cout << m_res->mainMenu->commandAt(1)->getDescription() << std::endl;
+    m_outdate=true;
+}
+void MyGame::triggerEvent(SDL_Event *ev)
+{
+
+}
+void MyGame::update()
+{
+    if(m_outdate){
+        mRender->Present();
+        m_outdate=false;
+    }
 }

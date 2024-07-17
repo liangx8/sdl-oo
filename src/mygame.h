@@ -1,23 +1,26 @@
 #pragma once
 #include <memory>
-#include "soo_app.h"
+#include <SDL.h>
+#include "soo/soo_app.h"
+//#include "resources.h"
 class SooWindow;
 class SooRenderer;
 class SooTexture;
 class PngName;
 class SooBrush;
 class Resource;
-struct SDL_Rect;
 class MyGame:public SooApp{
 private:
     std::unique_ptr<SooWindow>   mWin;
     SooRenderer                 *mRender;
     std::unique_ptr<PngName>     mPngs;
     SDL_TimerID                  mTimer;
-    std::unique_ptr<Resource>    mRes;
     std::unique_ptr<SDL_Rect>    m_rectMain;
+    std::unique_ptr<Resource>   m_res;
     int mCount;
     void SetRandomPicture();
+    bool m_outdate;
+
 public:
     void ShowCount();
     MyGame(const char *title);
@@ -25,9 +28,8 @@ public:
     virtual ~MyGame();
 
 protected:
-    bool OnEvent(SDL_Event *ev);
-    bool Alter();
-    int Render();
-    int OnInit();
+    void triggerEvent(SDL_Event *ev);
+    void init();
+    void update();
 
 };

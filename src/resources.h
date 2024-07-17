@@ -1,15 +1,14 @@
 #pragma once
-
+#include <memory>
 class SooTexture;
 class SooRenderer;
-struct SDL_Rect;
+class MainMenu;
 class Resource{
 public:
-    SooTexture *background;
-    SooTexture *number[10];
-    SooTexture *menuItem[3];
+    std::unique_ptr<SooTexture> background;
+    //SooTexture *number[10];
+    std::unique_ptr<MainMenu> mainMenu;
     virtual ~Resource();
-
-    void loadTexture(SooRenderer *,int,int);
-    void renderMe(SooRenderer *render,SDL_Rect *rect);
+    Resource(SooRenderer *,int,int);
+    Resource(const Resource&)=delete;
 };

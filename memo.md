@@ -19,3 +19,10 @@
 
 # SDL_Texture
   在SDL2中替代Surface
+
+# Ｃ＋＋知识
+  1. 在函数中返回引用(Return reference in a function)
+
+  直接返回函数中的本地变量实体，这是错误的做法，编译器会有警告。因为本地变量是堆栈变量，会在函数返回后被回收
+
+  返回一个已经存在的全局或者中内存堆中的实体，这种做法会执行一个拷贝构造(copy construction)

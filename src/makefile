@@ -3,7 +3,7 @@ CC=g++
 RM=rm -rf
 CFLAGS=-Wall
 CFLAGS+=$(shell pkgconf sdl2 --cflags)
-TARGET=soo
+TARGET=block
 
 ifeq (${OPTS}X,X)
 	CFLAGS+=-O2
@@ -14,9 +14,10 @@ endif
 #CFLAGS +=-std=c++14
 
 SRCS=$(wildcard *.cc)
+SRCS+=$(wildcard soo/*.cc)
 OBJS=${SRCS:.cc=.o}
 LDFLAGS=-Wall
-LDFLAGS+=$(shell pkgconf sdl2 --libs)
+LDFLAGS+=-lSDL2
 LDFLAGS+=-lSDL2_image
 LDFLAGS+=-lSDL2_ttf
 LDFLAGS+=# -static
@@ -30,10 +31,12 @@ release:${OBJS}
 ${TARGET}:${OBJS}
 	${CC} -o $@ ${OBJS} ${LDFLAGS}
 clean:
-	${RM} *.o ${TARGET} *~
+	${RM} ${TARGET} *~
+	find -name \*.o -exec ${RM} \{} \;
+	find -name \*~ -exec ${RM} \{} \;
 
 
 #%.o:%.cpp
 .cc.o:
-	${CC} -c $< ${CFLAGS}
+	${CC} -c $< ${CFLAGS} -o $@
 

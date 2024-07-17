@@ -36,3 +36,7 @@ void SooSurface::SetColorKey(int flags,Uint32 rgb)
         throw EX(SDL_GetError());
     }
 }
+// const char* SooSurface::className()
+// {
+//     return "Class[SooSurface]";
+// }

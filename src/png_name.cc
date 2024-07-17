@@ -5,7 +5,7 @@
 #include <ctime> // clock()
 #include <cstdlib> // rand(),srand()
 #include "png_name.h"
-#include "soo_exception.h"
+#include "soo/soo_exception.h"
 
 PngName::~PngName()
 {

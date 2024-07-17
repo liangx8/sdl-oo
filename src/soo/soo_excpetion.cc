@@ -19,3 +19,8 @@ SooException::SooException(const exception &ex,const char *m):
 SooException::~SooException(){
 }
 
+// const char* SooException::className()
+// {
+//     return "Class[SooException]";
+// }
+
