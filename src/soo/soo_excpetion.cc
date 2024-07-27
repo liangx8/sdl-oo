@@ -1,5 +1,4 @@
 #include <iostream>
-#include <SDL.h>
 #include "soo_exception.h"
 
 const char *SooException::what() const throw(){

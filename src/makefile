@@ -2,7 +2,7 @@
 CC=g++
 RM=rm -rf
 CFLAGS=-Wall
-CFLAGS+=$(shell pkgconf sdl2 --cflags)
+#CFLAGS+=$(shell pkgconf sdl2 --cflags)
 TARGET=block
 
 ifeq (${OPTS}X,X)

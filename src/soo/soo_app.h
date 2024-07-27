@@ -1,22 +1,16 @@
 #pragma once
-class SooCommand;
-class SooApp{
+#include "soo_abstract_base.h"
+class SooModel;
+class SooApp:public SooAbstractBase{
 private:
-    int mMode;
+    SooModel *m_mdlCurrent,*m_mdlNext;
 protected:
-    virtual ~SooApp();
-    // 带事件的
-    virtual void triggerEvent(SDL_Event *)=0;
-    // 无事件发生时的空闲时段以及更新屏幕
-    virtual void update()=0;
-    virtual void init()=0;
+    SooApp();
+    ~SooApp();
+    virtual int init(void *)=0;
+    virtual int release(void *)=0;
 public:
-    SooApp(Uint32);
-    /**
-     * @param sdlFlag param of SDL_Init()
-     * @param imgFlag param of IMG_Init()
-     */
-    SooApp(Uint32 sdlFlag,Uint32 imgFlag);
-    SooApp(const SooApp&)=delete;
-    void Run();
+    virtual const char *className() const;
+    int run(void *param);
+    void setModel(SooModel *model);
 };
