@@ -1,14 +1,38 @@
 #include <exception>
+#include <utility>
+#include <iostream>
 #include "soo_app.h"
 #include "soo_model.h"
+#include "soo_command.h"
 class NoOpModel:public SooModel{
     void attach(void *_){}
-    int execute(void *_){return 0;}
+    int run(void *_){return 0;}
     void detach(void *_){}
 } noOperation;
-SooApp::SooApp():m_mdlCurrent(&noOperation),m_mdlNext(nullptr){}
+
+class SetModelCommand:public SooCommand{
+private:
+    SooModel **nextModel;
+    SetModelCommand(SooModel **ptrModel):nextModel(ptrModel){}
+public:
+    virtual int execute(void *arg){
+        *nextModel=static_cast<SooModel*>(arg);
+        return 0;
+    }
+    virtual ~SetModelCommand(){
+        std::cout << "释放类 SetModelCommand" << std::endl;
+    }
+    friend class SooApp;
+};
+SooApp::SooApp():
+    m_mdlCurrent(&noOperation),
+    m_mdlNext(nullptr),
+    m_nextModelCommand(new SetModelCommand(&m_mdlNext))
+    {}
 SooApp::~SooApp()
 {
+    auto del=static_cast<SetModelCommand *>(m_nextModelCommand);
+    delete del;
     // Nothing done
 }
 const char *SooApp::className()const{
@@ -27,7 +51,12 @@ int SooApp::run(void *param)
             m_mdlCurrent=m_mdlNext;
             m_mdlNext=nullptr;
         }
-        if(m_mdlCurrent->execute(param)){
+        while(!m_cmds.empty()){
+            auto pa=m_cmds.front();
+            m_cmds.pop();
+            pa.first->execute(pa.second);
+        }
+        if(m_mdlCurrent->run(param)){
             break;
         }
     }
@@ -38,5 +67,9 @@ int SooApp::run(void *param)
 }
 void SooApp::setModel(SooModel *model)
 {
-    m_mdlNext=model;
+    pushCommand(m_nextModelCommand,model);
+}
+void SooApp::pushCommand(SooCommand *cmd,void *arg)
+{
+    m_cmds.push(std::make_pair(cmd,arg));
 }

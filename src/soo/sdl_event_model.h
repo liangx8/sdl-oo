@@ -3,10 +3,10 @@
 #include "soo_model.h"
 class SdlEventModel:public SooModel{
 protected:
-    virtual int onEvent(SDL_Event *)=0;
-    virtual int present()=0;
+    virtual int onEvent(void *,SDL_Event *)=0;
+    virtual int present(void *)=0;
 public:
     virtual void attach(void *)=0;
-    virtual int execute(void *);
+    virtual int run(void *);
     virtual void detach(void *)=0;
 };

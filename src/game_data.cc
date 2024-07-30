@@ -43,6 +43,11 @@ int paint_bg(void* pixels,int pitch,int height,void *param){
 }
 SooModel *createMenuModel(SDL_Renderer *render,int win_w);
 void deleteMenuModel(SooModel *model);
+
+SooModel *createGameModel(SDL_Renderer *);
+void deleteGameModel(SooModel *obj);
+
+
 GameData::GameData()
 {
     if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK)){
@@ -71,11 +76,13 @@ GameData::GameData()
     SDL_Log("window size(%d,%d)",win_w,win_h);
     background->paintInPixel(paint_bg,nullptr,nullptr);
     menu=createMenuModel(renderer,win_w);
+    game=createGameModel(renderer);
     
 }
 GameData::~GameData()
 {
     deleteMenuModel(menu);
+    deleteGameModel(game);
     delete background;
     SDL_Quit();
 }

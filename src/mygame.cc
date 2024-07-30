@@ -9,9 +9,9 @@ MyGame::MyGame(const char *n):SooApp(),name(n){
 int MyGame::init(void *param){
     GameData *gd=static_cast<GameData *>(param);
     setModel(gd->menu);
+    gd->setModel=m_nextModelCommand;
     gd->background->renderCopy(gd->renderer,nullptr,nullptr);
     // delete next line;
-    SDL_RenderPresent(gd->renderer);
     return 0;
 }
 

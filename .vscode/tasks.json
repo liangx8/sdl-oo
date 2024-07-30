@@ -39,6 +39,19 @@
                 "cwd": "${workspaceFolder}/src"
             },
             "problemMatcher":"$gcc"
+        },
+        {
+            "label": "test",
+            "type": "shell",
+            "command": "make",
+            "presentation": {
+                "reveal": "silent"
+            },
+            "problemMatcher": "$gcc",
+            "options": {
+                "cwd": "${workspaceFolder}/test"
+            }
+
         }
     ]
 }
