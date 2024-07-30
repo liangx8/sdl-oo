@@ -11,7 +11,6 @@ int MyGame::init(void *param){
     setModel(gd->menu);
     gd->setModel=m_nextModelCommand;
     gd->background->renderCopy(gd->renderer,nullptr,nullptr);
-    // delete next line;
     return 0;
 }
 

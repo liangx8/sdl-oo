@@ -2,7 +2,6 @@
 
 int SdlEventModel::run(void *param){
     SDL_Event ev;
-    int cnt=0;
     while(SDL_PollEvent(&ev)){
         if(ev.type==SDL_QUIT){
             return -1;

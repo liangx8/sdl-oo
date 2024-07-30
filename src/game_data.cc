@@ -42,12 +42,7 @@ int paint_bg(void* pixels,int pitch,int height,void *param){
     return 0;
 }
 SooModel *createMenuModel(SDL_Renderer *render,int win_w);
-void deleteMenuModel(SooModel *model);
-
 SooModel *createGameModel(SDL_Renderer *);
-void deleteGameModel(SooModel *obj);
-
-
 GameData::GameData()
 {
     if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK)){
@@ -79,6 +74,9 @@ GameData::GameData()
     game=createGameModel(renderer);
     
 }
+
+void deleteMenuModel(SooModel *);
+void deleteGameModel(SooModel *);
 GameData::~GameData()
 {
     deleteMenuModel(menu);

@@ -39,6 +39,8 @@ private:
                 case SDLK_RETURN:
                     switch(menuSel){
                         case 0:
+                        gd->setModel->execute(gd->game);
+                        break;
                         case 1:
                         case 2:
                         break;
@@ -47,7 +49,6 @@ private:
                     }
                     break;
             }
-            //gd->setModel->execute(gd->game);
         }
         return 0;
     }

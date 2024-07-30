@@ -10,6 +10,7 @@ public:
     SDL_DisplayMode dm;
     int             win_w,win_h;
     SooModel        *menu,*game;
+    // change model
     SooCommand      *setModel;
 
     GameData();
