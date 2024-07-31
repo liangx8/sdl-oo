@@ -41,9 +41,9 @@ int paint_bg(void* pixels,int pitch,int height,void *param){
     
     return 0;
 }
-SooModel *createMenuModel(SDL_Renderer *render,int win_w);
-SooModel *createGameModel(SDL_Renderer *);
-GameData::GameData()
+SooModel *createMenuModel(GameData *,int );
+SooModel *createGameModel(GameData *);
+GameData::GameData(SooApp *ap):app(ap)
 {
     if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK)){
         throw EX(SDL_GetError());
@@ -70,8 +70,8 @@ GameData::GameData()
     background=new SdlTexture(renderer,SDL_PIXELFORMAT_RGBA8888,SDL_TEXTUREACCESS_STREAMING,win_w,win_h);
     SDL_Log("window size(%d,%d)",win_w,win_h);
     background->paintInPixel(paint_bg,nullptr,nullptr);
-    menu=createMenuModel(renderer,win_w);
-    game=createGameModel(renderer);
+    menu=createMenuModel(this,win_w);
+    game=createGameModel(this);
     
 }
 

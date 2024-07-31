@@ -2,13 +2,15 @@
 #include "soo/soo_exception.h"
 #include "soo/sdl_event_model.h"
 #include "soo/sdl_texture.h"
-#include "game_data.h"
 #include "soo/soo_command.h"
+#include "soo/soo_app.h"
+#include "game_data.h"
 #define ITEM_COUNT 4
 #define MENU_WIDTH 600
 
 class MenuModel:public SdlEventModel{
 private:
+    MenuModel(SooApp *app):SdlEventModel(app){}
     SdlTexture *menutext;
     SDL_Rect   range[ITEM_COUNT*2];
     int menuSel;
@@ -39,13 +41,14 @@ private:
                 case SDLK_RETURN:
                     switch(menuSel){
                         case 0:
-                        gd->setModel->execute(gd->game);
+                        m_app->setModel(gd->game);
                         break;
                         case 1:
                         case 2:
                         break;
                         case 3:
-                        return -1;
+                        m_app->quit();
+                        break;
                     }
                     break;
             }
@@ -98,6 +101,7 @@ private:
 public:
     virtual void attach(void *args){
         auto gd=static_cast<GameData*>(args);
+        gd->background->renderCopy(gd->renderer,nullptr,nullptr);
         for(int ix=0;ix<ITEM_COUNT;ix++){
             SDL_Rect *src=&range[ix];
             SDL_Rect *dst=&range[ix+ITEM_COUNT];
@@ -110,8 +114,7 @@ public:
     //     return SdlEventModel::execute(args);
     // }
     virtual void detach(void *args){}
-    virtual ~MenuModel(){}
-    friend SooModel *createMenuModel(SDL_Renderer *render,int win_w);
+    friend SooModel *createMenuModel(GameData *,int win_w);
 };
 
 
@@ -148,16 +151,16 @@ const int rng[]={            4,      8,  10,   13};
 #define CHAR_COUNT 13
 
 
-SooModel *createMenuModel(SDL_Renderer *render,int win_w)
+SooModel *createMenuModel(GameData *gd,int win_w)
 {
-    MenuModel *mm=new MenuModel();
+    MenuModel *mm=new MenuModel(gd->app);
     SDL_Color c={0xf3,0xb8,0xf0};
     TTF_Font *font=TTF_OpenFont(fontname[10],56);
     if(font==NULL){
         throw EX(TTF_GetError());
     }
     
-    auto tx=new SdlTexture(render,font,menustr,&c);
+    auto tx=new SdlTexture(gd->renderer,font,menustr,&c);
     int w,h;
     tx->getSize(&w,&h);
     w=w/CHAR_COUNT;

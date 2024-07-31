@@ -9,8 +9,10 @@ class SooApp:public SooAbstractBase{
 private:
     std::queue<std::pair<SooCommand *,void *>> m_cmds;
     SooModel *m_mdlCurrent,*m_mdlNext;
-protected:
     SooCommand* m_nextModelCommand;
+    SooCommand* m_quitCommand;
+    int m_isRun;
+protected:
     SooApp();
     ~SooApp();
     virtual int init(void *)=0;
@@ -18,6 +20,7 @@ protected:
 public:
     virtual const char *className() const;
     int run(void *param);
+    void quit();
     void setModel(SooModel *model);
     void pushCommand(SooCommand *,void *);
 };
