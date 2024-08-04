@@ -8,9 +8,8 @@ class SooCommand;
 class SooApp:public SooAbstractBase{
 private:
     std::queue<std::pair<SooCommand *,void *>> m_cmds;
-    SooModel *m_mdlCurrent,*m_mdlNext;
-    SooCommand* m_nextModelCommand;
-    SooCommand* m_quitCommand;
+    SooModel   *m_model;
+    SooCommand *m_quitCommand;
     int m_isRun;
 protected:
     SooApp();

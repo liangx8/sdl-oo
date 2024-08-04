@@ -1,11 +1,13 @@
 #include <SDL2/SDL.h>
+#include <random>
 #include "soo/soo_exception.h"
 #include "soo/sdl_texture.h"
 #include "game_data.h"
+
 #define SCREEN_MARGIN 100
+extern std::mt19937 rand32;
 
 
-#define RGBA8888(r,g,b,a) ((a) | ((b)<<8) | ((g)<<16) | ((r)<<24))
 
 #define GRID 88
 int paint_bg(void* pixels,int pitch,int height,void *param){
@@ -41,8 +43,12 @@ int paint_bg(void* pixels,int pitch,int height,void *param){
     
     return 0;
 }
-SooModel *createMenuModel(GameData *,int );
-SooModel *createGameModel(GameData *);
+
+#define AREA_R 0x8e
+#define AREA_G 0xb6
+#define AREA_B 0x8a
+
+
 GameData::GameData(SooApp *ap):app(ap)
 {
     if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK)){
@@ -72,15 +78,17 @@ GameData::GameData(SooApp *ap):app(ap)
     background->paintInPixel(paint_bg,nullptr,nullptr);
     menu=createMenuModel(this,win_w);
     game=createGameModel(this);
+    colors[0]=RGBA8888(AREA_R,AREA_G,AREA_B,0xff);
+    for(int ix=1;ix<256;ix++){
+        colors[ix]=rand32();
+    }
     
 }
 
-void deleteMenuModel(SooModel *);
-void deleteGameModel(SooModel *);
 GameData::~GameData()
 {
-    deleteMenuModel(menu);
-    deleteGameModel(game);
+    delete menu;
+    delete game;
     delete background;
     SDL_Quit();
 }

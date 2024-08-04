@@ -10,7 +10,7 @@
 
 class MenuModel:public SdlEventModel{
 private:
-    MenuModel(SooApp *app):SdlEventModel(app){}
+    MenuModel(SooApp *app,SDL_Renderer *render):SdlEventModel(app,render){}
     SdlTexture *menutext;
     SDL_Rect   range[ITEM_COUNT*2];
     int menuSel;
@@ -41,7 +41,7 @@ private:
                 case SDLK_RETURN:
                     switch(menuSel){
                         case 0:
-                        m_app->setModel(gd->game);
+                        m_app->setModel(gd->game,args);
                         break;
                         case 1:
                         case 2:
@@ -114,6 +114,7 @@ public:
     //     return SdlEventModel::execute(args);
     // }
     virtual void detach(void *args){}
+    virtual ~MenuModel(){}
     friend SooModel *createMenuModel(GameData *,int win_w);
 };
 
@@ -192,5 +193,6 @@ SooModel *createMenuModel(GameData *gd,int win_w)
 }
 void deleteMenuModel(SooModel *model)
 {
-    delete (MenuModel *)model;
+    auto mm=static_cast<MenuModel*>(model);
+    delete mm;
 }

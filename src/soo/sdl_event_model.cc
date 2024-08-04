@@ -17,4 +17,5 @@ int SdlEventModel::run(void *param){
     
     return 0;
 }
-SdlEventModel::SdlEventModel(SooApp *app):SooModel(app){}
+SdlEventModel::SdlEventModel(SooApp *app,SDL_Renderer *render)
+    try:SooModel(app){}catch(...){throw;}

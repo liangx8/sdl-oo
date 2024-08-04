@@ -19,3 +19,4 @@ public:
 #define EXMSG(ex,msg) SooException(ex,msg)
 
 #define THROW_SDL_NOT_ZERO(c) if(c){throw EX(SDL_GetError());}
+#define THROW_SDL_NULL(c) if(c==nullptr){throw EX(SDL_GetError());}
