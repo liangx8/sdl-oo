@@ -37,10 +37,7 @@ SdlTexture::~SdlTexture()
 {
     SDL_DestroyTexture(m_texture);
 }
-const char* SdlTexture::className()const
-{
-    return "SdlTexture";
-}
+
 void SdlTexture::asTarget(SDL_Renderer *renderer)
 {
     SDL_SetRenderTarget(renderer,m_texture);

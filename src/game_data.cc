@@ -48,8 +48,8 @@ int paint_bg(void* pixels,int pitch,int height,void *param){
 #define AREA_G 0xb6
 #define AREA_B 0x8a
 
-
-GameData::GameData(SooApp *ap):app(ap)
+/*
+GameData::GameData()
 {
     if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK)){
         throw EX(SDL_GetError());
@@ -71,24 +71,18 @@ GameData::GameData(SooApp *ap):app(ap)
     if(SDL_CreateWindowAndRenderer(win_w,win_h,0,&win,&renderer)){
         throw EX(SDL_GetError());
     }
-    SDL_SetWindowTitle(win,"方块消除");
+    SDL_SetWindowTitle(win,"ありがとうございます");
     // background
     background=new SdlTexture(renderer,SDL_PIXELFORMAT_RGBA8888,SDL_TEXTUREACCESS_STREAMING,win_w,win_h);
     SDL_Log("window size(%d,%d)",win_w,win_h);
     background->paintInPixel(paint_bg,nullptr,nullptr);
-    menu=createMenuModel(this,win_w);
-    game=createGameModel(this);
+
     colors[0]=RGBA8888(AREA_R,AREA_G,AREA_B,0xff);
     for(int ix=1;ix<256;ix++){
         colors[ix]=rand32();
     }
     
 }
-
+*/
 GameData::~GameData()
-{
-    delete menu;
-    delete game;
-    delete background;
-    SDL_Quit();
-}
+{}
