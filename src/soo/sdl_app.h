@@ -4,6 +4,7 @@
 #include "soo_exception.h"
 class SdlModel;
 class SdlView;
+class SdlTexture;
 class SdlApplication{
 private:
     SDL_Window            *m_window;
@@ -31,4 +32,10 @@ public:
     void setTitle(const char *);
     void setModel(SdlModel *model);
     void run();
+    void getSize(int *w,int *h) const;
+    void pushSdlView(SdlView *);
+    void initRenderView(SdlView *);
+    virtual void init()=0;
+
+    friend class SdlTexture;
 };

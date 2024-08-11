@@ -1,13 +1,13 @@
-#include <SDL2/SDL.h>
 #include <random>
+#include <memory>
+#include <SDL2/SDL.h>
 #include "soo/soo_exception.h"
 #include "soo/sdl_texture.h"
+#include "soo/sdl_app.h"
 #include "game_data.h"
 
 #define SCREEN_MARGIN 100
 extern std::mt19937 rand32;
-
-
 
 #define GRID 88
 int paint_bg(void* pixels,int pitch,int height,void *param){
@@ -84,5 +84,32 @@ GameData::GameData()
     
 }
 */
-GameData::~GameData()
-{}
+
+
+
+GameData::~GameData(){
+    delete background;
+}
+void initMenu(SdlApplication *);
+SdlModel *getMenu();
+std::unique_ptr<GameData> GameData::instancePtr;
+GameData::GameData(SdlApplication *ap):app(ap){
+    initMenu(ap);
+    menu=getMenu();
+}
+int GameData::paint(SDL_Renderer *ren){
+    int win_w,win_h;
+    app->getSize(&win_w,&win_h);
+    SDL_Log("window size(%d,%d)",win_w,win_h);
+    background=new SdlTexture(ren,SDL_PIXELFORMAT_RGBA8888,SDL_TEXTUREACCESS_STREAMING,win_w,win_h);
+    background->paintInPixel(paint_bg,nullptr,nullptr);
+    return 0;
+}
+GameData* GameData::getInstance(){
+    return instancePtr.get();
+}
+void GameData::init(SdlApplication *app)
+{
+    instancePtr=std::unique_ptr<GameData>(new GameData(app));
+    app->initRenderView(instancePtr.get());
+}

@@ -40,6 +40,8 @@ void SdlApplication::init(Uint32 imgFlag,const char *title,int w,int h,Uint32 wi
     }
 
     THROW_SDL_NOT_ZERO(SDL_CreateWindowAndRenderer(w,h,0,&m_window,&m_renderer))
+    m_width=w;
+    m_height=h;
     setTitle(title);
 }
 SdlApplication::SdlApplication(const char *title):SdlApplication(SDL_INIT_VIDEO | SDL_INIT_TIMER){
@@ -54,8 +56,8 @@ void SdlApplication::setTitle(const char *title){
 }
 void SdlApplication::setModel(SdlModel *model)
 {
-    m_model->detach(m_renderer);
-    model->attach(m_renderer);
+    m_model->detach(this);
+    model->attach(this);
     m_model=model;
 }
 
@@ -67,16 +69,15 @@ public:
 };
 static NoOpView noNoView;
 class NoOpModel:public SdlModel{
-    virtual void attach(SDL_Renderer *){};
+    virtual void attach(SdlApplication *){};
     virtual void onEvent(SDL_Event *ev){};
-    virtual void present(){};
-    virtual void detach(SDL_Renderer *){};
+    virtual void present(SdlApplication *){};
+    virtual void detach(SdlApplication *){};
 };
 static NoOpModel noOpModel;
 class QuitCommand:public SooCommand{
-private:
-    int *m_isRun;
 public:
+    int *m_isRun;
     QuitCommand():m_isRun(nullptr){}
     virtual int execute(void *){
         if(m_isRun){
@@ -84,27 +85,24 @@ public:
         }
         return 0;
     }
-    void setRun(int *ptrRun){
-        m_isRun=ptrRun;
-    }
 };
 QuitCommand quitCommand;
 void SdlApplication::run()
 {
     SDL_Event event;
     m_model=&noOpModel;
-    m_flistViews.push_front(&noNoView);
     int isRun=1;
-    quitCommand.setRun(&isRun);
+    quitCommand.m_isRun=&isRun;
+    init();
     while(isRun){
         while(SDL_PollEvent(&event)){
             if(event.type==SDL_QUIT){
-                m_model->detach(m_renderer);
+                m_model->detach(this);
                 isRun=0;
             }
             m_model->onEvent(&event);
         }
-        m_model->present();
+        m_model->present(this);
         int update=0;
         for(auto vws:m_flistViews){
             update=1;
@@ -115,5 +113,17 @@ void SdlApplication::run()
             SDL_RenderPresent(m_renderer);
         }
     }
-    quitCommand.setRun(nullptr);
+    quitCommand.m_isRun=nullptr;
+}
+void SdlApplication::getSize(int *w,int *h) const
+{
+    *w=m_width;
+    *h=m_height;
+}
+void SdlApplication::pushSdlView(SdlView *view){
+    m_flistViews.push_front(view);
+}
+void SdlApplication::initRenderView(SdlView *view)
+{
+    view->paint(m_renderer);
 }

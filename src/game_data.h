@@ -1,18 +1,24 @@
 #pragma once
+#include <memory>
 #include <SDL2/SDL.h>
+#include "soo/sdl_view.h"
 class SdlTexture;
 class SdlModel;
 class SdlApplication;
-class GameData{
+class GameData :public SdlView{
+private:
+    static std::unique_ptr<GameData> instancePtr;
+    GameData(SdlApplication  *app);
 public:
     SdlApplication  *app;
-    SDL_DisplayMode dm;
-    int             win_w,win_h;
     SdlModel        *menu,*game;
-
-    virtual ~GameData();
-    SdlTexture *background;
-    Uint32 colors[256];
+    SdlTexture      *background;
+    Uint32           colors[256];
+    GameData(const GameData&)=delete;
+    virtual          ~GameData();
+    static GameData* getInstance();
+    static void      init(SdlApplication *app);
+    virtual int      paint(SDL_Renderer *);
 };
 #define RGBA8888(r,g,b,a) ((a) | ((b)<<8) | ((g)<<16) | ((r)<<24))
 
