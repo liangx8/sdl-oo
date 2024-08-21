@@ -15,10 +15,11 @@ public:
     bool m_doDraw;
     bool m_occupy;
     void setProperties(SDL_Rect *rect,Uint32 color,bool fillDraw){
-        m_rect.x = rect->x;
-        m_rect.y = rect->y;
-        m_rect.w = rect->w;
-        m_rect.h = rect->h;        
+        memcpy(&m_rect,rect,sizeof(SDL_Rect));
+        // m_rect.x = rect->x;
+        // m_rect.y = rect->y;
+        // m_rect.w = rect->w;
+        // m_rect.h = rect->h;
         m_r      = RED(color);
         m_g      = GREEN(color);
         m_b      = BLUE(color);
@@ -50,8 +51,10 @@ SdlView *drawRect(SDL_Rect *rect,Uint32 color){
         return viewPtr;
     }
     auto view = new viewFillOrDrawRect();
-    view->setProperties(rect,color,true);
     
+    view->setProperties(rect,color,true);
+    g_vecPool.push_back(view);
+    SDL_Log("新建view");
     return view;
 }
 SdlView *fillRect(SDL_Rect *rect,Uint32 color){
@@ -65,6 +68,7 @@ SdlView *fillRect(SDL_Rect *rect,Uint32 color){
     auto view = new viewFillOrDrawRect();
     view->setProperties(rect,color,false);
     g_vecPool.push_back(view);
+    SDL_Log("新建view");
     return view;
 }
 void viewRelease(){

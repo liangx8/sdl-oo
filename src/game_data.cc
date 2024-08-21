@@ -4,10 +4,19 @@
 #include "soo/soo_exception.h"
 #include "soo/sdl_texture.h"
 #include "soo/sdl_app.h"
+#include "soo/sdl_view.h"
 #include "game_data.h"
 
+
+class _GameData:public GameData,public SdlView{
+public:
+    _GameData(SdlApplication *);
+    virtual          ~_GameData();
+    virtual int      paint(SDL_Renderer *);
+};
+
 #define SCREEN_MARGIN 100
-extern std::mt19937 rand32;
+std::mt19937 rand32;
 
 #define GRID 88
 int paint_bg(void* pixels,int pitch,int height,void *param){
@@ -19,7 +28,7 @@ int paint_bg(void* pixels,int pitch,int height,void *param){
     const Uint32 border = RGBA8888(0x80,0xff,0x80,0xff);
 #else
     SDL_PixelFormat *format= SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888);
-    const Uint32 bg     = SDL_MapRGBA(format,0x12,0x34,0x56,0);
+    const Uint32 bg     = SDL_MapRGBA(format,0x4b,0x7d,0x91,0xff);
     const Uint32 line   = SDL_MapRGBA(format,0x80,0x80,0x80,0x80);
     const Uint32 border = SDL_MapRGBA(format,0x80,0xff,0x80,0xff);
     SDL_FreeFormat(format);
@@ -48,56 +57,24 @@ int paint_bg(void* pixels,int pitch,int height,void *param){
 #define AREA_G 0xb6
 #define AREA_B 0x8a
 
-/*
-GameData::GameData()
-{
-    if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK)){
-        throw EX(SDL_GetError());
-    }
-    if(TTF_Init()){
-        throw EX(TTF_GetError());
-    }
-    if(SDL_GetCurrentDisplayMode(0,&dm)){
-        throw EX(SDL_GetError());
-    }
-    int num;
-    if((num=SDL_NumJoysticks())<1){
-        SDL_LogWarn(0,"没发现手柄");
-    } else {
-        SDL_Log("检测到%d个手柄",num);
-    }
-    win_w  = dm.w - (SCREEN_MARGIN * 4);
-    win_h = dm.h - (SCREEN_MARGIN * 2);
-    if(SDL_CreateWindowAndRenderer(win_w,win_h,0,&win,&renderer)){
-        throw EX(SDL_GetError());
-    }
-    SDL_SetWindowTitle(win,"ありがとうございます");
-    // background
-    background=new SdlTexture(renderer,SDL_PIXELFORMAT_RGBA8888,SDL_TEXTUREACCESS_STREAMING,win_w,win_h);
-    SDL_Log("window size(%d,%d)",win_w,win_h);
-    background->paintInPixel(paint_bg,nullptr,nullptr);
 
-    colors[0]=RGBA8888(AREA_R,AREA_G,AREA_B,0xff);
-    for(int ix=1;ix<256;ix++){
-        colors[ix]=rand32();
-    }
-    
-}
-*/
-
-
-
-GameData::~GameData(){
+_GameData::~_GameData(){
     delete background;
 }
 void initMenu(SdlApplication *);
 SdlModel *getMenu();
-std::unique_ptr<GameData> GameData::instancePtr;
-GameData::GameData(SdlApplication *ap):app(ap){
+std::unique_ptr<_GameData> instancePtr;
+SdlModel *getGame();
+_GameData::_GameData(SdlApplication *ap){
+    app=ap;
     initMenu(ap);
     menu=getMenu();
+    game=getGame();
+    for(int ix=1;ix<256;ix++){
+        colors[ix]=rand32();
+    }
 }
-int GameData::paint(SDL_Renderer *ren){
+int _GameData::paint(SDL_Renderer *ren){
     int win_w,win_h;
     app->getSize(&win_w,&win_h);
     SDL_Log("window size(%d,%d)",win_w,win_h);
@@ -110,6 +87,7 @@ GameData* GameData::getInstance(){
 }
 void GameData::init(SdlApplication *app)
 {
-    instancePtr=std::unique_ptr<GameData>(new GameData(app));
-    app->initRenderView(instancePtr.get());
+    _GameData *pgd=new _GameData(app);
+    instancePtr=std::unique_ptr<_GameData>(pgd);
+    app->initRenderView(pgd);
 }

@@ -58,7 +58,7 @@ public:
         SDL_Rect rct={(m_menu.win_w-MENU_WIDTH)/2,sr->y-2,MENU_WIDTH,sr->h+4};
         THROW_SDL_NOT_ZERO(SDL_RenderDrawRect(ren,&rct));
         if(m_menu.menuSel != m_menu.oldMenuSel){
-            SDL_Log("wipe out old rect %d/%d",m_menu.menuSel,m_menu.oldMenuSel);
+            //SDL_Log("wipe out old rect %d/%d",m_menu.menuSel,m_menu.oldMenuSel);
             deselect(&m_menu,m_menu.oldMenuSel,ren);
             m_menu.oldMenuSel=m_menu.menuSel;
         }
@@ -67,26 +67,24 @@ public:
 };
 
 
-class MenuModel:public SdlModel{
+class ModelMenu:public SdlModel{
 private:
-    static std::unique_ptr<MenuModel> instancePtr;
-    MenuModel(SdlApplication *);
+    ModelMenu(SdlApplication *);
     FocusMenuView m_focus;
     int focusUpdate;
 public:
-    MenuModel(const MenuModel &)=delete;
+    ModelMenu(const ModelMenu &)=delete;
     virtual void attach(SdlApplication *);
-    virtual void onEvent(SDL_Event *ev);
+    virtual void onEvent(SDL_Event *,SdlApplication *);
     virtual void present(SdlApplication *);
     virtual void detach(SdlApplication *);
 
-    virtual ~MenuModel();
+    virtual ~ModelMenu();
     friend void initMenu(SdlApplication *);
-    friend SdlModel *getMenu();
 };
+static std::unique_ptr<ModelMenu> instancePtr;
 
 
-std::unique_ptr<MenuModel> MenuModel::instancePtr;
 const char *const fontname[]={
 "/usr/share/fonts/gnu-free/FreeMono.otf",
 "/usr/share/fonts/gnu-free/FreeMonoOblique.otf",
@@ -115,10 +113,10 @@ const char *const fontname[]={
 "/usr/share/imlib2/data/fonts/morpheus.ttf"
 };
 const char *menustr="开始游戏按键控制难度玩腻了";
-const int rng[]={            4,      8,  10,   13};
-#define CHAR_COUNT 13
+const int rng[]=    {        4,      8,  10,   13};
 
 class InitMenuView:public SdlView{
+    /*这个对象只需要被执行１次 */
 public:
     MenuView *menuView;
     SdlApplication *app;
@@ -135,7 +133,7 @@ public:
         menuView->win_w=win_w;
         menuView->win_h=win_h;
         menuView->textureMenuStr->getSize(&width,&height);
-        width=width/CHAR_COUNT;
+        width=width/rng[3];
         int st=0;
         int y=190;
         for (int ix=0;ix<ITEM_COUNT;ix++){
@@ -160,20 +158,25 @@ public:
 };
 
 
-MenuModel::MenuModel(SdlApplication *app)
+ModelMenu::ModelMenu(SdlApplication *app)
 {
+
+    InitMenuView imv;
+    imv.menuView= &m_focus.m_menu;
+    imv.app=app;
+    app->initRenderView(&imv);
     focusUpdate=0;
 }
-MenuModel::~MenuModel(){
+ModelMenu::~ModelMenu(){
     SDL_Log("destory resources of Menu ...");
     delete m_focus.m_menu.textureMenuStr;
 }
-void MenuModel::attach(SdlApplication *app)
+void ModelMenu::attach(SdlApplication *app)
 {
     app->pushSdlView(&m_focus);
     app->pushSdlView(&m_focus.m_menu);
 }
-void MenuModel::onEvent(SDL_Event *ev)
+void ModelMenu::onEvent(SDL_Event *ev,SdlApplication *app)
 {
     if(ev->type==SDL_KEYUP){
         switch(ev->key.keysym.sym){
@@ -199,10 +202,22 @@ void MenuModel::onEvent(SDL_Event *ev)
                 focusUpdate=1;
             }
             break;
+            case SDLK_RETURN:
+            {
+
+                GameData *gd=GameData::getInstance();
+                if(m_focus.m_menu.menuSel==3){
+                    app->quit();
+                }
+                if(m_focus.m_menu.menuSel==0){
+                    app->setModel(gd->game);
+                }
+            }
+            break;
         }
     }
 }
-void MenuModel::present(SdlApplication *app)
+void ModelMenu::present(SdlApplication *app)
 {
     if(focusUpdate){
         app->pushSdlView(&m_focus);
@@ -210,19 +225,14 @@ void MenuModel::present(SdlApplication *app)
 
     }
 }
-void MenuModel::detach(SdlApplication *render)
+void ModelMenu::detach(SdlApplication *render)
 {
 }
-
 void initMenu(SdlApplication *app){
-    InitMenuView imv;
-    MenuModel::instancePtr=std::unique_ptr<MenuModel>(new MenuModel(app));
-    MenuModel *mm=MenuModel::instancePtr.get();
-    imv.menuView= &mm->m_focus.m_menu;
-    imv.app=app;
-    app->initRenderView(&imv);
+    instancePtr=std::unique_ptr<ModelMenu>(new ModelMenu(app));
+    
 }
 SdlModel *getMenu()
 {
-    return MenuModel::instancePtr.get();
+    return instancePtr.get();
 }

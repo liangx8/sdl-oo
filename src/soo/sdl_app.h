@@ -35,6 +35,7 @@ public:
     void getSize(int *w,int *h) const;
     void pushSdlView(SdlView *);
     void initRenderView(SdlView *);
+    void quit();
     virtual void init()=0;
 
     friend class SdlTexture;

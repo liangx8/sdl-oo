@@ -70,7 +70,7 @@ public:
 static NoOpView noNoView;
 class NoOpModel:public SdlModel{
     virtual void attach(SdlApplication *){};
-    virtual void onEvent(SDL_Event *ev){};
+    virtual void onEvent(SDL_Event *,SdlApplication *){};
     virtual void present(SdlApplication *){};
     virtual void detach(SdlApplication *){};
 };
@@ -100,7 +100,7 @@ void SdlApplication::run()
                 m_model->detach(this);
                 isRun=0;
             }
-            m_model->onEvent(&event);
+            m_model->onEvent(&event,this);
         }
         m_model->present(this);
         int update=0;
@@ -114,6 +114,12 @@ void SdlApplication::run()
         }
     }
     quitCommand.m_isRun=nullptr;
+    viewRelease();
+    TTF_Quit();
+    SDL_Quit();
+}
+void  SdlApplication::quit(){
+    quitCommand.execute(nullptr);
 }
 void SdlApplication::getSize(int *w,int *h) const
 {
