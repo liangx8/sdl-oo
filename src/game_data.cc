@@ -15,7 +15,6 @@ public:
     virtual int      paint(SDL_Renderer *);
 };
 
-#define SCREEN_MARGIN 100
 std::mt19937 rand32;
 
 #define GRID 88
@@ -77,7 +76,7 @@ _GameData::_GameData(SdlApplication *ap){
 int _GameData::paint(SDL_Renderer *ren){
     int win_w,win_h;
     app->getSize(&win_w,&win_h);
-    SDL_Log("window size(%d,%d)",win_w,win_h);
+    SDL_Log("game_data.cc(80) %d,%d",win_w,win_h);
     background=new SdlTexture(ren,SDL_PIXELFORMAT_RGBA8888,SDL_TEXTUREACCESS_STREAMING,win_w,win_h);
     background->paintInPixel(paint_bg,nullptr,nullptr);
     return 0;
@@ -89,5 +88,5 @@ void GameData::init(SdlApplication *app)
 {
     _GameData *pgd=new _GameData(app);
     instancePtr=std::unique_ptr<_GameData>(pgd);
-    app->initRenderView(pgd);
+    app->renderView(pgd);
 }

@@ -10,6 +10,8 @@
 class MenuView:public SdlView{
 public:
     SdlTexture *textureMenuStr;
+    // 文字一texture的方式被放在显存中。每个被显示的内容被SDL_Rect定义好，
+    // 存放的位置分２部分，前面一部分
     SDL_Rect range[ITEM_COUNT*2];
     int menuSel,oldMenuSel;
     int win_w,win_h;
@@ -20,6 +22,16 @@ public:
             SDL_Rect *src=&range[ix];
             SDL_Rect *dst=&range[ix+ITEM_COUNT];
             textureMenuStr->renderCopy(ren,src,dst);
+#if 0
+
+            SDL_Rect rect;
+            memcpy(&rect,dst,sizeof(SDL_Rect));
+            rect.x --;
+            rect.y--;
+            rect.w=rect.w+2;
+            rect.h=rect.h+2;
+            SDL_RenderDrawRect(ren,&rect);
+#endif
         }
         return 0;
     }
@@ -112,9 +124,12 @@ const char *const fontname[]={
 "/usr/share/imlib2/data/fonts/cinema.ttf",
 "/usr/share/imlib2/data/fonts/morpheus.ttf"
 };
-const char *menustr="开始游戏按键控制难度玩腻了";
+const char *menustr="壹贰叁肆伍六柒捌玖拾伍六柒";
+//const char *menustr="开始游戏按键控制难度玩腻了";
 const int rng[]=    {        4,      8,  10,   13};
-
+/*
+1 根据屏幕的尺寸来定义菜单文字的大小
+*/
 class InitMenuView:public SdlView{
     /*这个对象只需要被执行１次 */
 public:
@@ -122,20 +137,30 @@ public:
     SdlApplication *app;
     virtual int paint(SDL_Renderer *ren){
         SDL_Log("initializing Menu ...");
+        int win_w,win_h;
+        app->getSize(&win_w,&win_h);
+        SDL_Log("window size(%d,%d)",win_w,win_h);
+        if((win_w < 1024)||(win_h < 768)){
+            throw SooException("屏幕最小1024*768");
+        }
+
+        int fontSize=win_h/ITEM_COUNT/4;
+        SDL_Log("菜单字体大小:%d",fontSize);
         SDL_Color co={0xf0,0xa8,0xe0};
-        TTF_Font *font=TTF_OpenFont(fontname[11],60);
+        TTF_Font *font=TTF_OpenFont(fontname[11],fontSize);
         THROW_SDL_NULL(font)
         menuView->textureMenuStr=new SdlTexture(ren,font,menustr,&co);
         THROW_SDL_NULL(menuView->textureMenuStr)
         int width,height;
-        int win_w,win_h;
-        app->getSize(&win_w,&win_h);
         menuView->win_w=win_w;
         menuView->win_h=win_h;
         menuView->textureMenuStr->getSize(&width,&height);
         width=width/rng[3];
+        SDL_Log("TEXTURE 菜单字体:%d,%d",width,height);
         int st=0;
-        int y=190;
+        int y=win_h * 15 / 100;
+        int yy=(win_h - y)/ITEM_COUNT - height;
+        y=y/2;
         for (int ix=0;ix<ITEM_COUNT;ix++){
             menuView->range[ix].x=st*width;
             menuView->range[ix].y=0;
@@ -148,7 +173,7 @@ public:
             menuView->range[ix+ITEM_COUNT].y=y;
             menuView->range[ix+ITEM_COUNT].w=src->w;
             menuView->range[ix+ITEM_COUNT].h=src->h;
-            y += 55 + src->h;        
+            y += yy + src->h;        
         }
         menuView->menuSel=0;
         menuView->oldMenuSel=0;
@@ -164,7 +189,7 @@ ModelMenu::ModelMenu(SdlApplication *app)
     InitMenuView imv;
     imv.menuView= &m_focus.m_menu;
     imv.app=app;
-    app->initRenderView(&imv);
+    app->renderView(&imv);
     focusUpdate=0;
 }
 ModelMenu::~ModelMenu(){
@@ -173,8 +198,8 @@ ModelMenu::~ModelMenu(){
 }
 void ModelMenu::attach(SdlApplication *app)
 {
-    app->pushSdlView(&m_focus);
-    app->pushSdlView(&m_focus.m_menu);
+    app->renderView(&m_focus.m_menu);
+    app->renderView(&m_focus);
 }
 void ModelMenu::onEvent(SDL_Event *ev,SdlApplication *app)
 {
@@ -220,7 +245,7 @@ void ModelMenu::onEvent(SDL_Event *ev,SdlApplication *app)
 void ModelMenu::present(SdlApplication *app)
 {
     if(focusUpdate){
-        app->pushSdlView(&m_focus);
+        app->renderView(&m_focus);
         focusUpdate=0;
 
     }

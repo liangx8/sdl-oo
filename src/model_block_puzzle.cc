@@ -3,9 +3,13 @@
 #include "soo/sdl_texture.h"
 #include "soo/sdl_view.h"
 #include "game_data.h"
-#include "game_block_puzzle.h"
+#include "blpu.h"
+
+#define COL_NUM           35
 
 class ModelBlockPuzzle:public SdlModel{
+private:
+    BlockPuzzle *m_blockPuzzle;
 public:
     virtual void attach(SdlApplication *);
     virtual void onEvent(SDL_Event *ev,SdlApplication *);
@@ -14,20 +18,23 @@ public:
 };
 //extern SdlView *blockPuzzleBackground;
 void ModelBlockPuzzle::attach(SdlApplication *app){
-    //GameData *gd=GameData::getInstance();
+    GameData *gd=GameData::getInstance();
     int w,h;
     app->getSize(&w,&h);
-    int gamew = BLOCK_PUZZLE_SIZE*COL_NUM;
-    int gamex = (w - gamew)/2;
-    SDL_Rect rect={gamex,100,gamew,h-200};
-    app->pushSdlView(fillRect(&rect,RGBA8888(0x34,0x56,0x78,0xff)));
+    m_blockPuzzle = new BlockPuzzle(w,h,COL_NUM,40,&gd->colors[0]);
+    app->renderView(m_blockPuzzle->background());
     SDL_Log("block puzzle attach");
 }
 
 void ModelBlockPuzzle::present(SdlApplication *app){
-
+    auto view=m_blockPuzzle->update();
+    if(view != nullptr){
+        SDL_Log("model_block_puzzle.cc(32):check point");
+        app->renderView(view);
+    }
 }
 void ModelBlockPuzzle::detach(SdlApplication *app){
+    delete m_blockPuzzle;
     SDL_Log("block puzzle detach");
 }
 void ModelBlockPuzzle::onEvent(SDL_Event *ev,SdlApplication *app){

@@ -10,8 +10,10 @@ private:
     SDL_Window            *m_window;
     SDL_Renderer          *m_renderer;
     SdlModel              *m_model;
+    SDL_DisplayMode        m_displayMode;
     int                    m_width,m_height;
-    std::forward_list<SdlView *> m_flistViews;
+    bool                   m_update;
+//    std::forward_list<SdlView *> m_flistViews;
     SdlApplication(Uint32 flag);
     void init(
         Uint32      imgFlag,
@@ -33,8 +35,10 @@ public:
     void setModel(SdlModel *model);
     void run();
     void getSize(int *w,int *h) const;
-    void pushSdlView(SdlView *);
-    void initRenderView(SdlView *);
+    void getScreenSize(int *w,int *h) const;
+    void setWindowSize(int w,int h);
+    void renderView(SdlView *);
+
     void quit();
     virtual void init()=0;
 

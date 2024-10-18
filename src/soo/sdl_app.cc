@@ -44,14 +44,27 @@ void SdlApplication::init(Uint32 imgFlag,const char *title,int w,int h,Uint32 wi
     m_height=h;
     setTitle(title);
 }
-SdlApplication::SdlApplication(const char *title):SdlApplication(SDL_INIT_VIDEO | SDL_INIT_TIMER){
-    SDL_DisplayMode dm;
-    THROW_SDL_NOT_ZERO(SDL_GetCurrentDisplayMode(0,&dm))
-    const int win_w=dm.w - DEFAULT_BORDER_WIDTH * 4;
-    const int win_h=dm.h - DEFAULT_BORDER_WIDTH - DEFAULT_BORDER_WIDTH;
+void SdlApplication::getScreenSize(int *w,int *h) const
+{
+    *w=m_displayMode.w;
+    *h=m_displayMode.h;
+}
+void SdlApplication::setWindowSize(int w,int h)
+{
+    SDL_SetWindowSize(m_window,w,h);
+    m_width=w;
+    m_height=h;
+}
+SdlApplication::SdlApplication(const char *title):SdlApplication(SDL_INIT_VIDEO | SDL_INIT_TIMER)
+{
+    SDL_DisplayMode *dm=&m_displayMode;
+    THROW_SDL_NOT_ZERO(SDL_GetCurrentDisplayMode(0,dm))
+    const int win_w=dm->w - DEFAULT_BORDER_WIDTH * 4;
+    const int win_h=dm->h - DEFAULT_BORDER_WIDTH - DEFAULT_BORDER_WIDTH;
     init(IMG_INIT_PNG,title,win_w,win_h,SDL_WINDOW_SHOWN);
 }
-void SdlApplication::setTitle(const char *title){
+void SdlApplication::setTitle(const char *title)
+{
     SDL_SetWindowTitle(m_window,title);
 }
 void SdlApplication::setModel(SdlModel *model)
@@ -103,18 +116,12 @@ void SdlApplication::run()
             m_model->onEvent(&event,this);
         }
         m_model->present(this);
-        int update=0;
-        for(auto vws:m_flistViews){
-            update=1;
-            vws->paint(m_renderer);
-        }
-        if(update){
-            m_flistViews.clear();
+        if(m_update){
             SDL_RenderPresent(m_renderer);
+            m_update=false;
         }
     }
     quitCommand.m_isRun=nullptr;
-    viewRelease();
     TTF_Quit();
     SDL_Quit();
 }
@@ -123,13 +130,11 @@ void  SdlApplication::quit(){
 }
 void SdlApplication::getSize(int *w,int *h) const
 {
-    *w=m_width;
-    *h=m_height;
+    //*w=m_width;
+    //*h=m_height;
+    SDL_GetWindowSizeInPixels(m_window,w,h);
 }
-void SdlApplication::pushSdlView(SdlView *view){
-    m_flistViews.push_front(view);
-}
-void SdlApplication::initRenderView(SdlView *view)
-{
+void SdlApplication::renderView(SdlView *view){
+    m_update=true;
     view->paint(m_renderer);
 }
