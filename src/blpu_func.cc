@@ -8,7 +8,16 @@
 #include "game_data.h"
 
 extern std::mt19937 rand32;
-extern const Uint16 *blpu_block;
+const Uint16 blpu_block[]={
+    0b1,0b11,0b111,0b1111,0b11111,
+    0b11+(0b0110<<8),
+    0b0110+(0b1100<<8),
+    0b001100000011,
+    0b010000000111,
+    0b000100000111,
+    0b001000001110,
+    0b111100001000
+};
 #define RED(u32)   (((u32) >> 24) & 0xff)
 #define GREEN(u32) (((u32) >> 16) & 0xff)
 #define BLUE(u32)  (((u32) >> 8)  & 0xff)
@@ -90,6 +99,7 @@ int nextBlockView::paint(SDL_Renderer *ren)
     rect.y=outy+1;
     rect.w=m_data->unitSize;
     rect.h=m_data->unitSize;
+    SDL_Log("block source:%4x",block);
     THROW_SDL_NOT_ZERO(SDL_SetRenderDrawColor(ren,RED(color),GREEN(color),BLUE(color),0xff))
     for(int ix=0;ix<8;ix++){
         if(block){
@@ -104,8 +114,8 @@ int nextBlockView::paint(SDL_Renderer *ren)
         rect.x+=m_data->unitSize+1;
     }
     rect.x=outx+1;
-    rect.y=m_data->unitSize+1;
-    for(int ix=8;ix<16;ix++){
+    rect.y+=m_data->unitSize+1;
+    for(int ix=0;ix<8;ix++){
         if(block){
             if(block & 1){
                 // 画一格
@@ -131,7 +141,7 @@ int backgroundView::paint(SDL_Renderer *ren)
 void BlockPuzzle::next()
 {
     auto u32=rand32();
-    auto idx=u32 % 11;
+    auto idx=u32 % 12;
     m_data->nextBlock=blpu_block[idx];
     m_data->color_idx1=(u32 >> 8) & 0xff;
 }
